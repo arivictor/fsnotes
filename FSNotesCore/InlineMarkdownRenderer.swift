@@ -109,7 +109,7 @@ public final class InlineMarkdownRenderer: NSObject, NSTextStorageDelegate {
     
     // MARK: - Properties
     
-    private var options: Options
+    private let options: Options
     private var highlighter: CodeHighlighter?
     private let codeBlockDetector = CodeBlockDetector()
     
