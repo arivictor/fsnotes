@@ -69,9 +69,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         }
         #endif
 
+        // SIMPLE MARKDOWN EDITOR MODE: Use a default temporary storage path
         if UserDefaultsManagement.storagePath == nil {
-            self.requestStorageDirectory()
-            return
+            let tempDir = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("MarkdownEditor")
+            try? FileManager.default.createDirectory(at: tempDir, withIntermediateDirectories: true, attributes: nil)
+            UserDefaultsManagement.storagePath = tempDir.path
         }
 
         let storyboard = NSStoryboard(name: "Main", bundle: nil)
@@ -82,6 +84,59 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         
         AppDelegate.mainWindowController = mainWC
         mainWC.window?.makeKeyAndOrderFront(nil)
+        
+        // SIMPLE MARKDOWN EDITOR MODE: Hide note management menu items
+        hideNoteManagementMenuItems()
+    }
+    
+    private func hideNoteManagementMenuItems() {
+        guard let mainMenu = NSApp.mainMenu else { return }
+        
+        // List of menu item identifiers to hide
+        let menuItemsToHide = [
+            "fileMenu.import",
+            "fileMenu.attach",
+            "fileMenu.backup",
+            "fileMenu.new",
+            "fileMenu.newInNewWindow",
+            "fileMenu.createFolder",
+            "fileMenu.searchAndCreate",
+            "fileMenu.open",
+            "fileMenu.duplicate",
+            "fileMenu.rename",
+            "fileMenu.forceRemove",
+            "fileMenu.togglePin",
+            "fileMenu.decrypt",
+            "fileMenu.toggleLock",
+            "fileMenu.external",
+            "fileMenu.reveal",
+            "fileMenu.move",
+            "fileMenu.history",
+            "shareMenu.copyURL",
+            "shareMenu.copyTitle",
+            "shareMenu.uploadOverSSH",
+            "shareMenu.removeOverSSH",
+            "fsnotes.lock",
+            "fsnotes.emptyBin"
+        ]
+        
+        for menuItem in mainMenu.items {
+            if let submenu = menuItem.submenu {
+                for item in submenu.items {
+                    if let identifier = item.identifier?.rawValue, menuItemsToHide.contains(identifier) {
+                        item.isHidden = true
+                    }
+                    // Check nested submenus
+                    if let nestedSubmenu = item.submenu {
+                        for nestedItem in nestedSubmenu.items {
+                            if let identifier = nestedItem.identifier?.rawValue, menuItemsToHide.contains(identifier) {
+                                nestedItem.isHidden = true
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
         
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {

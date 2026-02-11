@@ -167,36 +167,39 @@ class ViewController: EditorViewController,
         configureLayout()
         configureEditor()
 
+        // SIMPLE MARKDOWN EDITOR MODE: Disabled file system monitoring and note list configuration
         // Must before event manager starts
-        self.storage.checkWelcome()
+        // self.storage.checkWelcome()
         
-        fsManager = FileSystemEventManager(storage: storage, delegate: self)
-        fsManager?.start()
+        // Disable file system monitoring for simple markdown editor
+        // fsManager = FileSystemEventManager(storage: storage, delegate: self)
+        // fsManager?.start()
 
-        loadBookmarks(data: UserDefaultsManagement.sftpAccessData)
-        loadBookmarks(data: UserDefaultsManagement.gitPrivateKeyData)
+        // loadBookmarks(data: UserDefaultsManagement.sftpAccessData)
+        // loadBookmarks(data: UserDefaultsManagement.gitPrivateKeyData)
 
-        loadMoveMenu()
-        loadSortBySetting()
-        checkSidebarConstraint()
+        // loadMoveMenu()
+        // loadSortBySetting()
+        // checkSidebarConstraint()
 
     #if CLOUD_RELATED_BLOCK
-        registerKeyValueObserver()
+        // registerKeyValueObserver()
     #endif
 
         ViewController.gitQueue.maxConcurrentOperationCount = 1
 
-        notesTableView.doubleAction = #selector(self.doubleClickOnNotesTable)
+        // notesTableView.doubleAction = #selector(self.doubleClickOnNotesTable)
 
-        DispatchQueue.global().async {
-            self.storage.loadInboxAndTrash()
-
-            DispatchQueue.main.async {
-                self.buildSearchQuery()
-                self.configureSidebar()
-                self.configureNoteList()
-            }
-        }
+        // SIMPLE MARKDOWN EDITOR MODE: Skip loading notes list
+        // DispatchQueue.global().async {
+        //     self.storage.loadInboxAndTrash()
+        //
+        //     DispatchQueue.main.async {
+        //         self.buildSearchQuery()
+        //         self.configureSidebar()
+        //         self.configureNoteList()
+        //     }
+        // }
     }
     
     override func viewDidAppear() {
@@ -230,6 +233,21 @@ class ViewController: EditorViewController,
         if UserDefaultsManagement.fullScreen {
             view.window?.toggleFullScreen(nil)
         }
+        
+        // SIMPLE MARKDOWN EDITOR MODE: Hide sidebar and notes list
+        self.sidebarSplitView.setPosition(0, ofDividerAt: 0)
+        self.splitView.setPosition(0, ofDividerAt: 0)
+        
+        // Hide UI elements that are not needed for simple markdown editing
+        self.search.isHidden = true
+        self.newNoteButton.isHidden = true
+        self.outlineHeader.isHidden = true
+        self.lockedFolder.isHidden = true
+        self.counter.isHidden = true
+        self.notesCounter.isHidden = true
+        
+        // Focus on the editor
+        self.view.window?.makeFirstResponder(self.editor)
     }
 
     public func preLoadProjectsData() {
