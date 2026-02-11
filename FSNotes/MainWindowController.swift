@@ -22,6 +22,9 @@ class MainWindowController: NSWindowController, NSWindowDelegate {
         self.window?.titlebarAppearsTransparent = true
 
         self.windowFrameAutosaveName = "myMainWindow"
+        
+        // SIMPLE MARKDOWN EDITOR MODE: Set window title
+        self.window?.title = "Markdown Editor"
     }
     
     func windowDidResize(_ notification: Notification) {
@@ -31,17 +34,14 @@ class MainWindowController: NSWindowController, NSWindowDelegate {
     func makeNew() {
         window?.makeKeyAndOrderFront(self)
         NSApp.activate(ignoringOtherApps: true)
-        refreshEditArea(focusSearch: true)
+        refreshEditArea(focusSearch: false) // Don't focus search in simple mode
     }
     
     func refreshEditArea(focusSearch: Bool = false) {
         guard let vc = ViewController.shared() else { return }
 
-        if vc.sidebarOutlineView.isFirstLaunch || focusSearch {
-            vc.search.window?.makeFirstResponder(vc.search)
-        } else {
-            vc.focusEditArea()
-        }
+        // SIMPLE MARKDOWN EDITOR MODE: Always focus editor, not search
+        vc.focusEditArea()
 
         vc.editor.updateTextContainerInset()
     }
