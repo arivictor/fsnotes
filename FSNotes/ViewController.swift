@@ -230,6 +230,21 @@ class ViewController: EditorViewController,
         if UserDefaultsManagement.fullScreen {
             view.window?.toggleFullScreen(nil)
         }
+        
+        // SIMPLE MARKDOWN EDITOR MODE: Hide sidebar and notes list
+        self.sidebarSplitView.setPosition(0, ofDividerAt: 0)
+        self.splitView.setPosition(0, ofDividerAt: 0)
+        
+        // Hide UI elements that are not needed for simple markdown editing
+        self.search.isHidden = true
+        self.newNoteButton.isHidden = true
+        self.outlineHeader.isHidden = true
+        self.lockedFolder.isHidden = true
+        self.counter.isHidden = true
+        self.notesCounter.isHidden = true
+        
+        // Focus on the editor
+        self.view.window?.makeFirstResponder(self.editor)
     }
 
     public func preLoadProjectsData() {
